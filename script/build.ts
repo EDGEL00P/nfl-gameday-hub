@@ -36,8 +36,9 @@ const allowlist = [
 const originalConsoleWarn = console.warn;
 console.warn = (...args) => {
   const message = args.join(" ");
-  // Suppress the PostCSS 'from' option warning from Tailwind CSS
-  if (message.includes("PostCSS") && message.includes("from")) return;
+  // Suppress the specific PostCSS 'from' option warning from Tailwind CSS
+  // This is a known benign warning that doesn't affect the build output
+  if (message.includes("did not pass the `from` option to `postcss.parse`")) return;
   originalConsoleWarn.apply(console, args);
 };
 
