@@ -1,0 +1,304 @@
+Product Vision
+
+Create the fastest, clearest, most intelligent NFL companion experience for live games, teams, players, and league narratives — optimized for real-time consumption, personal relevance, and broadcast-grade polish.
+
+This product does not replace broadcast — it augments it.
+
+⸻
+
+2. Goals & Success Criteria
+
+Business Goals
+	•	Increase daily active usage during live games
+	•	Become the default second-screen experience
+	•	Enable sponsorship-safe, non-intrusive monetization
+	•	Support future betting, fantasy, and media integrations
+
+User Goals
+	•	Instantly understand what’s happening now
+	•	Never miss important moments for favorite teams/players
+	•	Consume highlights, stats, and insights with zero friction
+
+Success Metrics (KPIs)
+	•	DAU/MAU ≥ 45% during season
+	•	Median time-to-live-score < 1s
+	•	Avg taps to core info ≤ 2
+	•	Notification opt-in rate ≥ 65%
+	•	Crash-free sessions ≥ 99.8%
+
+⸻
+
+3. Target Users
+
+Primary
+	•	NFL fans (casual → hardcore)
+	•	Live game viewers (TV, stadium, mobile)
+
+Secondary
+	•	Fantasy players
+	•	Sports bettors (future-ready)
+	•	Media professionals & analysts
+
+⸻
+
+4. Core Product Principles (2026 Standard)
+	1.	Real-time first
+	2.	Personalized by default
+	3.	Readable at a glance
+	4.	Predictive, not reactive
+	5.	Broadcast-level polish
+	6.	Zero dead ends
+
+⸻
+
+5. Core Features & Requirements
+
+⸻
+
+5.1 Home Feed (AI-Driven)
+
+Purpose: Immediate relevance on launch
+
+Requirements
+	•	Personalized feed based on:
+	•	Favorite teams
+	•	Favorite players
+	•	Current live games
+	•	Time of day / game phase
+	•	Auto-reorders during:
+	•	Kickoff windows
+	•	Final quarters
+	•	Overtime
+	•	“What you missed” recap post-game
+
+2026 UX Expectations
+	•	Predictive cards (e.g. “Your team starts in 12 mins”)
+	•	Dynamic layouts (no static homepage)
+
+⸻
+
+5.2 Live Scoreboard
+
+Purpose: Fastest league-wide awareness
+
+Requirements
+	•	All games view:
+	•	Score
+	•	Quarter
+	•	Clock
+	•	Possession indicator
+	•	Game state (live / final / upcoming)
+	•	Filters:
+	•	Favorites
+	•	Division
+	•	Prime-time
+	•	Offline fallback with timestamp
+
+UX Requirements
+	•	Readable in <2 seconds
+	•	No horizontal scrolling
+	•	One-tap entry to Game Center
+
+⸻
+
+5.3 Game Center (Critical Feature)
+
+Purpose: Second-screen command center
+
+Requirements
+	•	Live score & clock
+	•	Down & distance visualization
+	•	Drive charts
+	•	Scoring summary
+	•	Key player stats (contextual)
+	•	Live win probability (future-safe)
+
+2026 Enhancements
+	•	Micro-animations on scoring plays
+	•	Context-aware stat surfacing
+	•	Pinch to expand stats / plays
+
+⸻
+
+5.4 Teams Hub
+
+Purpose: Persistent team identity
+
+Requirements
+	•	Team overview
+	•	Schedule
+	•	Roster
+	•	Injury report
+	•	Standings snapshot
+	•	Recent form (last 5 games)
+
+UX Requirements
+	•	Team color system (accessibility-safe)
+	•	Sticky headers
+	•	Clear season context (Week / Record)
+
+⸻
+
+5.5 Player Profiles
+
+Purpose: Humanize stats
+
+Requirements
+	•	Player bio & photo
+	•	Season + recent stats
+	•	Game-by-game log
+	•	Injury status
+	•	Team & position context
+
+2026 UX
+	•	Stat trend visuals
+	•	Highlight linking
+	•	Tap-from-anywhere access
+
+⸻
+
+5.6 Standings & Playoff Picture
+
+Requirements
+	•	Conference & division views
+	•	Tiebreaker indicators
+	•	Clinched / eliminated states
+	•	Playoff projection (future-ready)
+
+UX
+	•	Zero confusion
+	•	Always labeled clearly
+	•	No scrolling traps
+
+⸻
+
+5.7 Highlights & Media
+
+Requirements
+	•	Short-form highlights
+	•	Game recap clips
+	•	Condensed game (rights-dependent)
+	•	Vertical & horizontal formats
+
+UX
+	•	Inline playback
+	•	No blocking modals
+	•	Progressive loading
+
+⸻
+
+5.8 Notifications System
+
+Purpose: Retention without annoyance
+
+Requirements
+	•	Opt-in by:
+	•	Team
+	•	Player
+	•	Event type
+	•	Smart throttling
+	•	Lock-screen live score updates
+
+2026 Enhancements
+	•	Context-aware notification timing
+	•	Haptic differentiation (iOS / Android)
+
+⸻
+
+5.9 Search & Discovery
+
+Requirements
+	•	Global search:
+	•	Teams
+	•	Players
+	•	Games
+	•	Voice search (OS-level)
+	•	Recent searches
+
+⸻
+
+6. Onboarding & Identity
+
+Requirements
+	•	Passkey / biometric login
+	•	Progressive onboarding:
+	1.	Pick teams
+	2.	Pick players
+	3.	Notification preferences
+	•	Skip-friendly, fast
+
+⸻
+
+7. Accessibility (Non-Negotiable)
+	•	Dynamic type scaling
+	•	Screen reader support
+	•	High-contrast mode
+	•	Large tap targets
+	•	Color-blind-safe palettes
+
+⸻
+
+8. Performance & Reliability
+
+Targets
+	•	App launch < 2s
+	•	Live update latency < 1s
+	•	Graceful degradation on poor networks
+	•	Cached fallback states
+
+⸻
+
+9. Monetization & Sponsorship (UX-Safe)
+
+Allowed
+	•	Inline sponsor cards
+	•	Branded stats modules
+	•	Premium insights tier (future)
+
+Disallowed
+	•	Full-screen interstitials during live play
+	•	Blocking ads on score views
+
+⸻
+
+10. Analytics & Telemetry
+
+Tracked
+	•	Screen flows
+	•	Live game engagement
+	•	Notification interactions
+	•	Drop-off points
+	•	Performance metrics
+
+⸻
+
+11. Non-Goals (Explicit)
+	•	No fantasy league management (v1)
+	•	No betting execution (future-ready only)
+	•	No social chat rooms (moderation risk)
+
+⸻
+
+12. Roadmap (High-Level)
+
+Phase 1 — MVP (Season Launch)
+	•	Scores, Game Center, Teams, Players, Notifications
+
+Phase 2 — Intelligence Layer
+	•	Predictive insights
+	•	Advanced personalization
+	•	Deeper media integration
+
+Phase 3 — Expansion
+	•	Fantasy overlays
+	•	Betting integrations (where legal)
+	•	Partner APIs
+
+⸻
+
+13. Why This Wins (Executive Summary)
+	•	Built for live moments
+	•	Designed for habit formation
+	•	Ready for future revenue streams
+	•	Meets 2026 OS & UX expectations
+	•	Feels league-grade, not startup-grade
