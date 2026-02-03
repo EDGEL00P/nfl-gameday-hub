@@ -32,6 +32,16 @@ const allowlist = [
   "zod-validation-error",
 ];
 
+// Suppress known benign PostCSS warnings that don't affect functionality
+const originalConsoleWarn = console.warn;
+console.warn = (...args) => {
+  const message = args.join(" ");
+  // Suppress the specific PostCSS 'from' option warning from Tailwind CSS
+  // This is a known benign warning that doesn't affect the build output
+  if (message.includes("did not pass the `from` option to `postcss.parse`")) return;
+  originalConsoleWarn.apply(console, args);
+};
+
 async function buildAll() {
   await rm("dist", { recursive: true, force: true });
 
