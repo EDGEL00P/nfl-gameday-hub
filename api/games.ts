@@ -5,7 +5,7 @@ const BDL_BASE = 'https://api.balldontlie.io/nfl';
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   
-  const apiKey = process.env.BALLDONTLIE_API_KEY;
+  const apiKey = process.env.BALLDONTLIE_API_KEY?.trim();
   if (!apiKey) {
     return res.status(500).json({ error: 'BALLDONTLIE_API_KEY not configured' });
   }
@@ -15,13 +15,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       headers: { 'Authorization': apiKey }
     });
     
+    const text = await response.text();
+    
     if (!response.ok) {
-      return res.status(response.status).json({ error: 'BallDontLie API error' });
+      return res.status(response.status).json({ 
+        error: 'BallDontLie API error', 
+        status: response.status,
+        message: text 
+      });
     }
     
-    const data = await response.json();
+    const data = JSON.parse(text);
     res.json(data.data || []);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch games' });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to fetch games', message: err.message });
   }
 }
