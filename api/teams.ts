@@ -25,6 +25,7 @@ function transformTeam(bdlTeam: any) {
   const abbr = bdlTeam.abbreviation;
   return {
     id: abbr.toLowerCase(),
+    apiId: bdlTeam.id,
     name: bdlTeam.name,
     abbreviation: abbr,
     displayName: bdlTeam.full_name,

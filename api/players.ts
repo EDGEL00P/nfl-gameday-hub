@@ -51,7 +51,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { team_id, search } = req.query;
+    const { team_id, search, id } = req.query;
+    
+    if (id) {
+      const response = await fetch(`${BDL_BASE}/players/${id}`, {
+        headers: { 'Authorization': apiKey }
+      });
+      if (!response.ok) return res.status(response.status).json({ error: 'API error' });
+      const data = await response.json();
+      return res.json([transformPlayer(data.data)]);
+    }
+
     let url = `${BDL_BASE}/players?per_page=100`;
     
     if (team_id) {

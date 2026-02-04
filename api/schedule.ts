@@ -75,10 +75,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    const { team_id } = req.query;
+    let url = `${BDL_BASE}/games?season=2025&per_page=100`;
+    
+    if (team_id) {
+      url += `&team_ids[]=${team_id}`;
+    }
+
     // Fetch multiple pages for full schedule
-    const response = await fetch(`${BDL_BASE}/games?season=2025&per_page=100`, {
+    const response = await fetch(url, {
       headers: { 'Authorization': apiKey }
     });
+
     
     if (!response.ok) {
       return res.status(response.status).json({ error: 'API error' });

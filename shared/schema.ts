@@ -54,6 +54,7 @@ export type UserTicket = typeof userTickets.$inferSelect;
 // NFL Team interface
 export interface NFLTeam {
   id: string;
+  apiId?: number;
   name: string;
   abbreviation: string;
   displayName: string;

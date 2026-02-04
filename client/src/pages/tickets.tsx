@@ -14,16 +14,6 @@ import { NFL_TEAMS } from "@/lib/nfl-teams";
 import { useLocationDetection, formatCurrency } from "@/hooks/use-location-detection";
 import { motion } from "framer-motion";
 
-// Mock ticket listings
-const mockListings: TicketListing[] = [
-  { id: "1", gameId: "game1", broker: "ticketmaster", section: "120", row: "A", seats: 2, price: 250, currency: "USD", fees: 45, totalPrice: 295, rating: 4.8, deliveryType: "mobile", available: true, url: "#" },
-  { id: "2", gameId: "game1", broker: "stubhub", section: "235", row: "F", seats: 4, price: 125, currency: "USD", fees: 22, totalPrice: 147, rating: 4.2, deliveryType: "electronic", available: true, url: "#" },
-  { id: "3", gameId: "game1", broker: "seatgeek", section: "105", row: "C", seats: 2, price: 320, currency: "USD", fees: 58, totalPrice: 378, rating: 4.9, deliveryType: "mobile", available: true, url: "#" },
-  { id: "4", gameId: "game1", broker: "ticketmaster", section: "320", row: "J", seats: 3, price: 85, currency: "USD", fees: 15, totalPrice: 100, rating: 3.8, deliveryType: "mobile", available: true, url: "#" },
-  { id: "5", gameId: "game1", broker: "stubhub", section: "140", row: "B", seats: 2, price: 290, currency: "USD", fees: 52, totalPrice: 342, rating: 4.7, deliveryType: "electronic", available: true, url: "#" },
-  { id: "6", gameId: "game1", broker: "seatgeek", section: "415", row: "L", seats: 6, price: 65, currency: "USD", fees: 12, totalPrice: 77, rating: 3.5, deliveryType: "electronic", available: true, url: "#" },
-];
-
 export default function Tickets() {
   const { location } = useLocationDetection();
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,7 +21,7 @@ export default function Tickets() {
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [selectedBroker, setSelectedBroker] = useState("all");
 
-  const { data: listings = mockListings, isLoading } = useQuery<TicketListing[]>({
+  const { data: listings = [], isLoading } = useQuery<TicketListing[]>({
     queryKey: ["/api/tickets", selectedTeam, priceRange, selectedBroker],
   });
 
