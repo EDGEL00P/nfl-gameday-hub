@@ -9,7 +9,7 @@ import { ThemeProvider } from "@/lib/theme-provider";
 import { FavoritesProvider } from "@/contexts/favorites-context";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { SearchTrigger, GlobalSearch } from "@/components/global-search";
+import { GlobalSearch } from "@/components/global-search";
 import { SkipLinks } from "@/components/skip-link";
 import { OfflineBanner } from "@/components/offline-banner";
 import { GlobalLoadingIndicator, PageLoader } from "@/components/loading-indicator";
@@ -74,14 +74,13 @@ function App() {
                   >
                     <SidebarTrigger data-testid="button-sidebar-toggle" aria-label="Toggle sidebar navigation" />
                     <div className="flex-1 flex justify-center max-w-md mx-4">
-                      <SearchTrigger />
+                      <GlobalSearch />
                     </div>
                     <div className="flex items-center gap-2">
                       <ThemeToggle />
                     </div>
                   </header>
                   <OfflineBanner />
-                  <GlobalSearch />
                   <main id="main-content" className="flex-1 overflow-auto" role="main" aria-label="Main content">
                     <Suspense fallback={<PageLoader />}>
                       <Router />
