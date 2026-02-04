@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const BDL_BASE = 'https://api.balldontlie.io/nfl';
+const BDL_BASE = 'https://api.balldontlie.io/nfl/v1';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -11,18 +11,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const response = await fetch(`${BDL_BASE}/games?seasons[]=2024&per_page=50`, {
+    const response = await fetch(`${BDL_BASE}/games?season=2024&per_page=50`, {
       headers: { 'Authorization': apiKey }
     });
     
     const text = await response.text();
     
     if (!response.ok) {
-      return res.status(response.status).json({ 
-        error: 'BallDontLie API error', 
-        status: response.status,
-        message: text 
-      });
+      return res.status(response.status).json({ error: 'BallDontLie API error', status: response.status, message: text });
     }
     
     const data = JSON.parse(text);
