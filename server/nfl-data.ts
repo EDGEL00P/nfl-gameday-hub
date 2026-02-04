@@ -383,4 +383,84 @@ function getPlayDescription(type: string, yards: number): string {
   }
 }
 
+// Transform BallDontLie games to app format
+import type { BDLGame, BDLStanding, BDLTeam } from "./balldontlie";
+
+function findTeamByAbbreviation(abbr: string): typeof NFL_TEAMS_DATA[0] | undefined {
+  return NFL_TEAMS_DATA.find(t => t.abbreviation.toLowerCase() === abbr.toLowerCase());
+}
+
+export function transformBDLGames(bdlGames: BDLGame[]): NFLGame[] {
+  return bdlGames.map(g => {
+    const homeTeamData = findTeamByAbbreviation(g.home_team.abbreviation) || NFL_TEAMS_DATA[0];
+    const awayTeamData = findTeamByAbbreviation(g.visitor_team.abbreviation) || NFL_TEAMS_DATA[1];
+    
+    const status = g.status.toLowerCase().includes('final') ? 'final' 
+      : g.status.toLowerCase().includes('progress') || g.period > 0 ? 'in_progress' 
+      : 'scheduled';
+
+    return {
+      id: String(g.id),
+      date: g.datetime || g.date,
+      time: g.time || "TBD",
+      status,
+      homeTeam: { ...homeTeamData, record: { wins: 0, losses: 0, ties: 0, winPercentage: 0, conferenceRecord: "0-0", divisionRecord: "0-0", homeRecord: "0-0", awayRecord: "0-0", streak: "-", pointsFor: 0, pointsAgainst: 0 } },
+      awayTeam: { ...awayTeamData, record: { wins: 0, losses: 0, ties: 0, winPercentage: 0, conferenceRecord: "0-0", divisionRecord: "0-0", homeRecord: "0-0", awayRecord: "0-0", streak: "-", pointsFor: 0, pointsAgainst: 0 } },
+      homeScore: g.home_team_score,
+      awayScore: g.visitor_team_score,
+      quarter: g.period,
+      timeRemaining: g.time,
+      possession: "",
+      down: 0,
+      distance: 0,
+      yardLine: 0,
+      redZone: false,
+      broadcasts: [{ network: "NFL", type: "tv" as const }],
+      venue: g.venue || homeTeamData.stadium?.name || "Stadium",
+    };
+  });
+}
+
+export function transformBDLStandings(bdlStandings: BDLStanding[]): Record<string, StandingsEntry[]> {
+  const standings: Record<string, StandingsEntry[]> = {};
+  
+  bdlStandings.forEach(s => {
+    const teamData = findTeamByAbbreviation(s.team.abbreviation);
+    if (!teamData) return;
+    
+    const divKey = `${s.team.conference} ${s.team.division}`;
+    if (!standings[divKey]) standings[divKey] = [];
+    
+    const [homeW, homeL] = (s.home_record || "0-0").split('-').map(Number);
+    const [awayW, awayL] = (s.road_record || "0-0").split('-').map(Number);
+    
+    standings[divKey].push({
+      team: { ...teamData, record: { wins: s.wins, losses: s.losses, ties: s.ties || 0, winPercentage: s.wins / (s.wins + s.losses || 1), conferenceRecord: s.conference_record, divisionRecord: s.division_record, homeRecord: s.home_record, awayRecord: s.road_record, streak: s.streak || "-", pointsFor: s.points_for || 0, pointsAgainst: s.points_against || 0 } },
+      rank: s.division_rank,
+      wins: s.wins,
+      losses: s.losses,
+      ties: s.ties || 0,
+      winPercentage: s.wins / (s.wins + s.losses || 1),
+      conferenceWins: parseInt(s.conference_record?.split('-')[0] || "0"),
+      conferenceLosses: parseInt(s.conference_record?.split('-')[1] || "0"),
+      divisionWins: parseInt(s.division_record?.split('-')[0] || "0"),
+      divisionLosses: parseInt(s.division_record?.split('-')[1] || "0"),
+      homeWins: homeW || 0,
+      homeLosses: homeL || 0,
+      awayWins: awayW || 0,
+      awayLosses: awayL || 0,
+      pointsFor: s.points_for || 0,
+      pointsAgainst: s.points_against || 0,
+      pointDifferential: (s.points_for || 0) - (s.points_against || 0),
+      streak: s.streak || "-",
+      last5: "-",
+      playoffSeed: s.conference_rank,
+    });
+  });
+  
+  Object.keys(standings).forEach(k => standings[k].sort((a, b) => b.winPercentage - a.winPercentage));
+  return standings;
+}
+
 export { NFL_TEAMS_DATA };
+

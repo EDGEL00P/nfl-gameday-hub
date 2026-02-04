@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { generateGames, generateNews, generateStandings, generateTicketListings, generatePlays, NFL_TEAMS_DATA } from "./nfl-data";
+import { generateGames, generateNews, generateStandings, generateTicketListings, generatePlays, NFL_TEAMS_DATA, transformBDLGames, transformBDLStandings } from "./nfl-data";
+import { bdlClient } from "./balldontlie";
 import OpenAI from "openai";
 import { translationRequestSchema } from "@shared/schema";
 import { WebSocketServer, WebSocket } from "ws";
@@ -26,9 +27,16 @@ export async function registerRoutes(
   // ============== NFL Games API ==============
   
   // Get all games (with optional week filter)
-  app.get("/api/games", (req, res) => {
-    const games = generateGames();
-    res.json(games);
+  app.get("/api/games", async (req, res) => {
+    try {
+      if (bdlClient.isConfigured()) {
+        const bdlGames = await bdlClient.getGames({ seasons: [2024], per_page: 50 });
+        if (bdlGames.length > 0) {
+          return res.json(transformBDLGames(bdlGames));
+        }
+      }
+    } catch (err) { console.error("[API] BDL games error:", err); }
+    res.json(generateGames());
   });
   
   // Get specific game by ID
@@ -90,9 +98,16 @@ export async function registerRoutes(
   
   // ============== NFL Standings API ==============
   
-  app.get("/api/standings", (req, res) => {
-    const standings = generateStandings();
-    res.json(standings);
+  app.get("/api/standings", async (req, res) => {
+    try {
+      if (bdlClient.isConfigured()) {
+        const bdlStandings = await bdlClient.getStandings(2024);
+        if (bdlStandings.length > 0) {
+          return res.json(transformBDLStandings(bdlStandings));
+        }
+      }
+    } catch (err) { console.error("[API] BDL standings error:", err); }
+    res.json(generateStandings());
   });
   
   // ============== NFL Schedule API ==============
