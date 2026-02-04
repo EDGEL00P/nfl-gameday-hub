@@ -1,6 +1,20 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { addDays, format, parseISO } from 'date-fns';
 
 const BDL_BASE = 'https://api.balldontlie.io/nfl/v1';
+
+// Helper to generate week dates for 2025 Season
+// Week 1 starts Sept 4, 2025
+const SEASON_START = '2025-09-03'; // Wednesday before kickoff
+
+function getWeekDates(week: number) {
+  const start = addDays(parseISO(SEASON_START), (week - 1) * 7);
+  const end = addDays(start, 6);
+  return {
+    start_date: format(start, 'yyyy-MM-dd'),
+    end_date: format(end, 'yyyy-MM-dd')
+  };
+}
 
 const TEAM_LOGOS: Record<string, string> = {
   ARI: 'https://a.espncdn.com/i/teamlogos/nfl/500/ari.png', ATL: 'https://a.espncdn.com/i/teamlogos/nfl/500/atl.png',
@@ -19,12 +33,14 @@ const TEAM_LOGOS: Record<string, string> = {
   PIT: 'https://a.espncdn.com/i/teamlogos/nfl/500/pit.png', SEA: 'https://a.espncdn.com/i/teamlogos/nfl/500/sea.png',
   SF: 'https://a.espncdn.com/i/teamlogos/nfl/500/sf.png', TB: 'https://a.espncdn.com/i/teamlogos/nfl/500/tb.png',
   TEN: 'https://a.espncdn.com/i/teamlogos/nfl/500/ten.png', WAS: 'https://a.espncdn.com/i/teamlogos/nfl/500/wsh.png',
+  WSH: 'https://a.espncdn.com/i/teamlogos/nfl/500/wsh.png',
 };
 
 function transformTeam(bdlTeam: any) {
   const abbr = bdlTeam.abbreviation;
   return {
     id: abbr.toLowerCase(),
+    apiId: bdlTeam.id,
     name: bdlTeam.name,
     abbreviation: abbr,
     displayName: bdlTeam.full_name,
@@ -33,10 +49,9 @@ function transformTeam(bdlTeam: any) {
     color: '#002244',
     alternateColor: '#869397',
     logo: TEAM_LOGOS[abbr] || `https://a.espncdn.com/i/teamlogos/nfl/500/${abbr.toLowerCase()}.png`,
-    conference: bdlTeam.conference === 'AFC' || bdlTeam.conference === 'NFC' ? bdlTeam.conference : 'AFC',
-    division: bdlTeam.division?.replace('NORTH', 'North').replace('SOUTH', 'South').replace('EAST', 'East').replace('WEST', 'West') || 'East',
-    stadium: { id: 'stadium', name: 'Stadium', city: bdlTeam.location, state: '', country: 'USA', capacity: 70000, surface: 'Grass', roofType: 'Open', latitude: 0, longitude: 0, timezone: 'America/New_York', sections: [], amenities: [] },
-    record: { wins: 0, losses: 0, ties: 0, winPercentage: 0, conferenceRecord: '0-0', divisionRecord: '0-0', homeRecord: '0-0', awayRecord: '0-0', streak: '-', pointsFor: 0, pointsAgainst: 0 }
+    conference: bdlTeam.conference,
+    division: bdlTeam.division,
+    record: { wins: 0, losses: 0, ties: 0 }
   };
 }
 
@@ -61,8 +76,7 @@ function transformGame(bdlGame: any) {
     distance: 0,
     yardLine: 0,
     redZone: false,
-    broadcasts: [{ network: 'NFL', type: 'tv' }],
-    venue: bdlGame.venue || 'Stadium',
+    venue: bdlGame.venue || 'Stadium'
   };
 }
 
@@ -75,18 +89,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { team_id } = req.query;
-    let url = `${BDL_BASE}/games?season=2025&per_page=100`;
+    const { team_id, week } = req.query;
     
-    if (team_id) {
+    // Default to full 2025 season
+    let url = `${BDL_BASE}/games?seasons[]=2025&per_page=100`;
+    
+    // Add filtering
+    if (team_id && team_id !== 'all') {
       url += `&team_ids[]=${team_id}`;
     }
+    
+    if (week) {
+      const { start_date, end_date } = getWeekDates(Number(week));
+      url += `&start_date=${start_date}&end_date=${end_date}`;
+    }
 
-    // Fetch multiple pages for full schedule
+    // Fetch multiple pages if filtering isn't specific might be needed, 
+    // but with week filtering, 100 is plenty (max 16 games/week).
+    // If team_id is present, 100 covers full season (17 games).
+    // So 100 limit is fine.
+
     const response = await fetch(url, {
       headers: { 'Authorization': apiKey }
     });
-
     
     if (!response.ok) {
       return res.status(response.status).json({ error: 'API error' });
@@ -94,6 +119,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     const data = await response.json();
     const games = (data.data || []).map(transformGame);
+    
     res.json(games);
   } catch (err: any) {
     res.status(500).json({ error: err.message });

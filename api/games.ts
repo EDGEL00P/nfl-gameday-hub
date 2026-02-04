@@ -94,12 +94,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const response = await fetch(`${BDL_BASE}/games?season=2025&per_page=50`, {
+    // Fetch 2024 and 2025 seasons to ensure we get late occurring games (Playoffs/Super Bowl)
+    // and use per_page=100 to get a good chunk.
+    const response = await fetch(`${BDL_BASE}/games?seasons[]=2024&seasons[]=2025&per_page=100&start_date=2024-09-01`, {
       headers: { 'Authorization': apiKey }
     });
     
     if (!response.ok) {
       const text = await response.text();
+      // helpful error log for user
+      console.error(`[API] BallDontLie Error: ${response.status} ${text}`);
       return res.status(response.status).json({ error: 'BallDontLie API error', message: text });
     }
     

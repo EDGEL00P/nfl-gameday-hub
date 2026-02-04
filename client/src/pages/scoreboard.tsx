@@ -21,7 +21,8 @@ import {
   Tv,
   ChevronRight,
   Circle,
-  Loader2
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import type { NFLGame } from "@shared/schema";
 import { motion, AnimatePresence } from "framer-motion";
@@ -231,7 +232,7 @@ export default function Scoreboard() {
   const { favoriteTeams } = useFavoriteTeams();
   const { games: wsGames, isConnected } = useWebSocket();
 
-  const { data: apiGames = [], isLoading, refetch } = useQuery<NFLGame[]>({
+  const { data: apiGames = [], isLoading, error, refetch } = useQuery<NFLGame[]>({
     queryKey: ["/api/games"],
     refetchInterval: isConnected ? false : 10000,
   });
@@ -446,6 +447,30 @@ export default function Scoreboard() {
           <span className="text-sm text-amber-700 dark:text-amber-300">
             You're offline. Showing cached data from {relativeTime}.
           </span>
+        </motion.div>
+      )}
+
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="mb-6 p-6 rounded-lg bg-destructive/10 border border-destructive/30"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <AlertCircle className="h-5 w-5 text-destructive" />
+            <h3 className="font-bold text-destructive">Unable to fetch live games</h3>
+          </div>
+          <p className="text-sm text-destructive/90 mb-4">
+            {(error as Error).message || "An error occurred while connecting to the game data provided."}
+          </p>
+          <div className="text-sm text-muted-foreground bg-background/50 p-3 rounded border border-border/50">
+            <p className="font-medium mb-1">Troubleshooting:</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Check your internet connection</li>
+              <li>Verify <strong>BALLDONTLIE_API_KEY</strong> environment variable is set</li>
+              <li>Check browser console for details</li>
+            </ul>
+          </div>
         </motion.div>
       )}
 

@@ -15,6 +15,7 @@ import newsHandler from "../api/news";
 import ticketsHandler from "../api/tickets";
 import playersHandler from "../api/players";
 import statsHandler from "../api/stats";
+import advancedStatsHandler from "../api/advanced-stats";
 
 // Lazy OpenAI initialization
 let openai: OpenAI | null = null;
@@ -67,6 +68,7 @@ export async function registerRoutes(
   app.get("/api/tickets", handle(ticketsHandler));
   app.get("/api/players", handle(playersHandler));
   app.get("/api/stats", handle(statsHandler));
+  app.get("/api/advanced-stats", handle(advancedStatsHandler));
 
   // Translation API
   app.post("/api/translate", async (req, res) => {

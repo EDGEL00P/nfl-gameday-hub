@@ -46,7 +46,7 @@ export default function PlayerProfile() {
   const team = teams.find(t => t.id === player?.team.toLowerCase());
   const teamColor = team?.color || "#000000";
 
-  // 3. Get Stats
+  // 3. Get Stats (BallDontLie)
   const { data: gameLogs = [] } = useQuery<any[]>({ 
     queryKey: ["/api/stats", { player_id: playerId }]
   });
@@ -75,12 +75,18 @@ export default function PlayerProfile() {
     receiving: game.rec_yards || 0,
   }));
 
+  // 4. Get Advanced Stats (NFLVerse)
+  const { data: advancedStats } = useQuery<any>({
+    queryKey: ["/api/advanced-stats", { name: player?.displayName }],
+    enabled: !!player?.displayName
+  });
+
   if (isLoadingPlayer) {
-    return <div className="p-8 text-center">Loading player data...</div>;
+    return <div className="p-8 text-center animate-pulse">Loading player data...</div>;
   }
 
   if (!player) {
-    return <div className="p-8 text-center">Player not found</div>;
+    return <div className="p-8 text-center text-muted-foreground">Player not found</div>;
   }
 
   return (
@@ -134,10 +140,17 @@ export default function PlayerProfile() {
               <p className="text-xs text-muted-foreground uppercase font-bold">Games</p>
               <p className="text-2xl font-bold">{seasonStats.games}</p>
             </div>
-            <div className="text-center p-3 bg-background/50 backdrop-blur rounded-lg">
-              <p className="text-xs text-muted-foreground uppercase font-bold">Fantasy Pts</p>
-              <p className="text-2xl font-bold" style={{ color: teamColor }}>{seasonStats.fantasyPoints.toFixed(1)}</p>
-            </div>
+            {advancedStats?.advanced_metrics?.epa_per_game ? (
+               <div className="text-center p-3 bg-background/50 backdrop-blur rounded-lg">
+                 <p className="text-xs text-muted-foreground uppercase font-bold">EPA / Game</p>
+                 <p className="text-2xl font-bold" style={{ color: teamColor }}>{advancedStats.advanced_metrics.epa_per_game.toFixed(2)}</p>
+               </div>
+            ) : (
+              <div className="text-center p-3 bg-background/50 backdrop-blur rounded-lg">
+                <p className="text-xs text-muted-foreground uppercase font-bold">Fantasy Pts</p>
+                <p className="text-2xl font-bold" style={{ color: teamColor }}>{seasonStats.fantasyPoints.toFixed(1)}</p>
+              </div>
+            )}
           </div>
         </div>
       </Card>
@@ -148,6 +161,7 @@ export default function PlayerProfile() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="gamelog">Game Log</TabsTrigger>
           <TabsTrigger value="trends">Trends</TabsTrigger>
+          {advancedStats && <TabsTrigger value="advanced">Advanced Metrics</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -170,6 +184,35 @@ export default function PlayerProfile() {
               <CardContent><div className="text-2xl font-bold">{seasonStats.recYards}</div></CardContent>
             </Card>
           </div>
+          
+          {advancedStats && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Advanced Metrics Snapshot</CardTitle>
+                <CardDescription>Powered by NFLVerse</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                     <p className="text-xs text-muted-foreground uppercase">Passing EPA</p>
+                     <p className="text-xl font-bold">{advancedStats.advanced_metrics.passing_epa_total?.toFixed(1) || '-'}</p>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                     <p className="text-xs text-muted-foreground uppercase">Rushing EPA</p>
+                     <p className="text-xl font-bold">{advancedStats.advanced_metrics.rushing_epa_total?.toFixed(1) || '-'}</p>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                     <p className="text-xs text-muted-foreground uppercase">Receiving EPA</p>
+                     <p className="text-xl font-bold">{advancedStats.advanced_metrics.receiving_epa_total?.toFixed(1) || '-'}</p>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                     <p className="text-xs text-muted-foreground uppercase">Total EPA</p>
+                     <p className="text-xl font-bold">{((advancedStats.advanced_metrics.passing_epa_total || 0) + (advancedStats.advanced_metrics.rushing_epa_total || 0) + (advancedStats.advanced_metrics.receiving_epa_total || 0)).toFixed(1)}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>
@@ -253,6 +296,47 @@ export default function PlayerProfile() {
             </CardContent>
           </Card>
         </TabsContent>
+        
+        {advancedStats && (
+          <TabsContent value="advanced">
+             <Card>
+              <CardHeader>
+                <CardTitle>Advanced Metrics (NFLVerse)</CardTitle>
+                <CardDescription>Metrics powered by nflverse-data ({advancedStats.season})</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-4 text-sm text-muted-foreground">
+                  Expected Points Added (EPA) measures the value of each play in terms of points. 
+                  Positive EPA means the player contributed to scoring points.
+                </p>
+                <div className="rounded-md border">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b bg-muted/50">
+                         <th className="p-2 text-left">Week</th>
+                         <th className="p-2 text-left">Opponent</th>
+                         <th className="p-2 text-right">Pass EPA</th>
+                         <th className="p-2 text-right">Rush EPA</th>
+                         <th className="p-2 text-right">Rec EPA</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {advancedStats.recent_games.map((g: any, i: number) => (
+                          <tr key={i} className="border-b last:border-0 hover:bg-muted/20">
+                            <td className="p-2">{g.week}</td>
+                            <td className="p-2">{g.opponent}</td>
+                            <td className={`p-2 text-right font-mono ${parseFloat(g.passing_epa) > 0 ? 'text-green-600' : 'text-red-500'}`}>{g.passing_epa}</td>
+                            <td className={`p-2 text-right font-mono ${parseFloat(g.rushing_epa) > 0 ? 'text-green-600' : 'text-red-500'}`}>{g.rushing_epa}</td>
+                            <td className={`p-2 text-right font-mono ${parseFloat(g.receiving_epa) > 0 ? 'text-green-600' : 'text-red-500'}`}>{g.receiving_epa}</td>
+                          </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+             </Card>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
