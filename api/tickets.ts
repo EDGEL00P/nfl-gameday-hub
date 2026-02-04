@@ -1,8 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { generateTicketListings } from '../server/nfl-data';
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
+// Tickets endpoint - BallDontLie doesn't have ticket data
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Content-Type', 'application/json');
-  res.status(200).json(generateTicketListings());
+  res.json([]);
 }
