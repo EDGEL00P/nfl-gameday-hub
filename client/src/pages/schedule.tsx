@@ -40,7 +40,7 @@ export default function Schedule() {
             NFL Schedule
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            2024-2025 Regular Season
+            2025-2026 Regular Season
           </p>
         </div>
       </div>

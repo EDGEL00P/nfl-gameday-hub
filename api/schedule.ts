@@ -76,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // Fetch multiple pages for full schedule
-    const response = await fetch(`${BDL_BASE}/games?season=2024&per_page=100`, {
+    const response = await fetch(`${BDL_BASE}/games?season=2025&per_page=100`, {
       headers: { 'Authorization': apiKey }
     });
     

@@ -79,7 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const response = await fetch(`${BDL_BASE}/standings?season=2024`, {
+    const response = await fetch(`${BDL_BASE}/standings?season=2025`, {
       headers: { 'Authorization': apiKey }
     });
     
