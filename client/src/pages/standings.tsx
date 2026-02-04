@@ -1,72 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StandingsTable } from "@/components/standings-table";
-import { Trophy, Users } from "lucide-react";
+import { Trophy, Users, Loader2 } from "lucide-react";
 import type { StandingsEntry } from "@shared/schema";
-import { getAllDivisions, NFL_TEAMS } from "@/lib/nfl-teams";
-
-// Generate mock standings data
-function generateMockStandings(): { [key: string]: StandingsEntry[] } {
-  const divisions = getAllDivisions();
-  const standings: { [key: string]: StandingsEntry[] } = {};
-
-  divisions.forEach((div) => {
-    const divisionKey = `${div.conference} ${div.division}`;
-    standings[divisionKey] = div.teams.map((team, index) => {
-      const wins = Math.floor(Math.random() * 13) + 3;
-      const losses = 17 - wins - Math.floor(Math.random() * 2);
-      const ties = 17 - wins - losses;
-      const pointsFor = Math.floor(Math.random() * 200) + 300;
-      const pointsAgainst = Math.floor(Math.random() * 200) + 280;
-      
-      return {
-        team: {
-          ...team,
-          record: {
-            wins,
-            losses,
-            ties,
-            winPercentage: wins / (wins + losses + ties),
-            conferenceRecord: `${Math.floor(wins * 0.6)}-${Math.floor(losses * 0.6)}`,
-            divisionRecord: `${Math.floor(wins * 0.3)}-${Math.floor(losses * 0.3)}`,
-            homeRecord: `${Math.floor(wins * 0.55)}-${Math.floor(losses * 0.45)}`,
-            awayRecord: `${Math.floor(wins * 0.45)}-${Math.floor(losses * 0.55)}`,
-            streak: Math.random() > 0.5 ? `W${Math.floor(Math.random() * 5) + 1}` : `L${Math.floor(Math.random() * 4) + 1}`,
-            pointsFor,
-            pointsAgainst,
-          },
-        },
-        rank: index + 1,
-        wins,
-        losses,
-        ties,
-        winPercentage: wins / (wins + losses + ties),
-        conferenceWins: Math.floor(wins * 0.6),
-        conferenceLosses: Math.floor(losses * 0.6),
-        divisionWins: Math.floor(wins * 0.3),
-        divisionLosses: Math.floor(losses * 0.3),
-        homeWins: Math.floor(wins * 0.55),
-        homeLosses: Math.floor(losses * 0.45),
-        awayWins: Math.floor(wins * 0.45),
-        awayLosses: Math.floor(losses * 0.55),
-        pointsFor,
-        pointsAgainst,
-        pointDifferential: pointsFor - pointsAgainst,
-        streak: Math.random() > 0.5 ? `W${Math.floor(Math.random() * 5) + 1}` : `L${Math.floor(Math.random() * 4) + 1}`,
-        last5: `${Math.floor(Math.random() * 4) + 1}-${Math.floor(Math.random() * 4)}`,
-        clinched: index === 0 && Math.random() > 0.7 ? "division" : undefined,
-        playoffSeed: index + 1,
-      };
-    }).sort((a, b) => b.winPercentage - a.winPercentage);
-  });
-
-  return standings;
-}
+import { getAllDivisions } from "@/lib/nfl-teams";
 
 export default function Standings() {
-  const { data: standingsData = generateMockStandings(), isLoading } = useQuery<{ [key: string]: StandingsEntry[] }>({
+  const { data: standingsData = {}, isLoading } = useQuery<{ [key: string]: StandingsEntry[] }>({
     queryKey: ["/api/standings"],
   });
+
 
   const divisions = getAllDivisions();
   const afcDivisions = divisions.filter(d => d.conference === "AFC");
